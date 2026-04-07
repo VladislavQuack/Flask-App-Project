@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>ExtremumAI | Clinical Workstation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body{font-family:Inter,sans-serif}
+        .tab-active{border-bottom:2px solid #2563eb;color:#2563eb}
+        /* Loading overlay for processing */
+        .processing-overlay {
+            position: absolute; inset: 0; background: rgba(255,255,255,0.8);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 10; display: none;
+        }
+        .processing-overlay.active { display: flex; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+<!-- Splash -->
+<section id="splash" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-50">
+  <div class="w-16 h-16 bg-blue-600 rounded-lg mb-6"></div>
+  <h1 class="text-3xl font-semibold">ExtremumAI</h1>
+  <p class="text-gray-600 mt-2">Clinical Decision Support Platform</p>
+  <button id="enter-btn" class="mt-10 px-8 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700">Enter Workstation</button>
+</section>
+
+<!-- Loader -->
+<section id="loader" class="fixed inset-0 bg-white hidden items-center justify-center z-40">
+  <div class="text-center">
+    <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+    <p class="text-gray-700">Loading AI models...</p>
+  </div>
+</section>
+
+<!-- App -->
+<div id="app" class="hidden min-h-screen">
+  <header class="bg-white border-b">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-blue-600 rounded"></div>
+        <span class="font-semibold text-xl">ExtremumAI</span>
+        <span class="text-xs text-gray-500 ml-4">v1.0 • CE Marked</span>
+      </div>
+      <div class="text-sm text-gray-600">Dr. A. Ivanov | Radiology</div>
+    </div>
+  </header>
+
+  <nav class="bg-white border-b">
+    <div class="max-w-7xl mx-auto px-6 flex gap-8">
+      <button data-target="breast" class="tab-btn py-3 tab-active">Breast Ultrasound</button>
+      <button data-target="brain" class="tab-btn py-3 text-gray-600 hover:text-gray-900">Brain MRI</button>
+      <button data-target="spine" class="tab-btn py-3 text-gray-600 hover:text-gray-900">Spine MRI</button>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto p-6">
+    <!-- Breast -->
+    <section id="breast" class="tab-content">
+      <div class="grid lg:grid-cols-3 gap-6">
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="font-semibold mb-4">Study Information</h2>
+          <div class="space-y-2 text-sm">
+            <div><span class="text-gray-500">Patient ID:</span> 102938</div>
+            <div><span class="text-gray-500">Modality:</span> Ultrasound</div>
+            <div><span class="text-gray-500">Study Date:</span> 2025-12-12</div>
+          </div>
+          <div class="mt-6">
+            <label class="block text-sm font-medium mb-2">Upload Image</label>
+            <input type="file" id="file-breast" accept="image/*" class="block w-full text-sm border rounded p-2">
+            <button id="run-breast" class="mt-4 w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Analyze</button>
+          </div>
+        </div>
+        <div class="lg:col-span-2 bg-white rounded-lg shadow p-6 relative">
+          <h2 class="font-semibold mb-4">Results</h2>
+          <p id="placeholder-breast" class="text-gray-500 text-sm">No study loaded.</p>
+          <div id="result-breast" class="hidden">
+            <div class="relative border rounded overflow-hidden">
+              <img id="preview-breast" class="w-full max-h-96 object-contain bg-gray-50"/>
+              <canvas id="canvas-breast" class="absolute inset-0 pointer-events-none"></canvas>
+            </div>
+            <div id="class-breast" class="mt-4 p-3 bg-gray-50 border rounded text-sm hidden"></div>
+          </div>
+          <!-- Processing Overlay -->
+          <div id="loader-breast" class="processing-overlay">
+             <div class="text-blue-600 font-medium">Processing...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Brain -->
+    <section id="brain" class="tab-content hidden">
+      <div class="grid lg:grid-cols-3 gap-6">
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="font-semibold mb-4">Study Information</h2>
+          <div class="space-y-2 text-sm">
+            <div><span class="text-gray-500">Patient ID:</span> 204517</div>
+            <div><span class="text-gray-500">Modality:</span> MRI</div>
+            <div><span class="text-gray-500">Study Date:</span> 2025-12-12</div>
+          </div>
+          <div class="mt-6">
+            <label class="block text-sm font-medium mb-2">Upload Image</label>
+            <input type="file" id="file-brain" accept="image/*" class="block w-full text-sm border rounded p-2">
+            <button id="run-brain" class="mt-4 w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Analyze</button>
+          </div>
+        </div>
+        <div class="lg:col-span-2 bg-white rounded-lg shadow p-6 relative">
+          <h2 class="font-semibold mb-4">Results</h2>
+          <p id="placeholder-brain" class="text-gray-500 text-sm">No study loaded.</p>
+          <div id="result-brain" class="hidden">
+            <div class="relative border rounded overflow-hidden">
+              <img id="preview-brain" class="w-full max-h-96 object-contain bg-gray-50"/>
+              <canvas id="canvas-brain" class="absolute inset-0 pointer-events-none"></canvas>
+            </div>
+          </div>
+          <div id="loader-brain" class="processing-overlay">
+             <div class="text-blue-600 font-medium">Processing...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Spine -->
+    <section id="spine" class="tab-content hidden">
+      <div class="grid lg:grid-cols-3 gap-6">
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="font-semibold mb-4">Study Information</h2>
+          <div class="space-y-2 text-sm">
+            <div><span class="text-gray-500">Patient ID:</span> 389201</div>
+            <div><span class="text-gray-500">Modality:</span> MRI</div>
+            <div><span class="text-gray-500">Study Date:</span> 2025-12-12</div>
+          </div>
+          <div class="mt-6">
+            <label class="block text-sm font-medium mb-2">Upload Image</label>
+            <input type="file" id="file-spine" accept="image/*" class="block w-full text-sm border rounded p-2">
+            <button id="run-spine" class="mt-4 w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Analyze</button>
+          </div>
+        </div>
+        <div class="lg:col-span-2 bg-white rounded-lg shadow p-6 relative">
+          <h2 class="font-semibold mb-4">Results</h2>
+          <p id="placeholder-spine" class="text-gray-500 text-sm">No study loaded.</p>
+          <div id="result-spine" class="hidden">
+            <div class="relative border rounded overflow-hidden">
+              <img id="preview-spine" class="w-full max-h-96 object-contain bg-gray-50"/>
+              <canvas id="canvas-spine" class="absolute inset-0 pointer-events-none"></canvas>
+            </div>
+          </div>
+          <div id="loader-spine" class="processing-overlay">
+             <div class="text-blue-600 font-medium">Processing...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="text-center text-xs text-gray-500 py-6 border-t mt-12">
+    ExtremumAI © 2025 • Research use only • Not a diagnostic device • HIPAA & GDPR compliant workflow
+  </footer>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // --- SPLASH & LOADER LOGIC ---
+  const splash = document.getElementById('splash');
+  const loader = document.getElementById('loader');
+  const app = document.getElementById('app');
+
+  document.getElementById('enter-btn').addEventListener('click', () => {
+    splash.classList.add('hidden');
+    loader.classList.remove('hidden'); 
+    loader.classList.add('flex');
+    setTimeout(() => {
+      loader.classList.add('hidden');
+      loader.classList.remove('flex');
+      app.classList.remove('hidden');
+    }, 1500);
+  });
+
+  // --- TAB NAVIGATION ---
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('tab-active');
+        b.classList.add('text-gray-600');
+      });
+      btn.classList.add('tab-active');
+      btn.classList.remove('text-gray-600');
+      
+      document.querySelectorAll('.tab-content').forEach(s => s.classList.add('hidden'));
+      document.getElementById(btn.dataset.target).classList.remove('hidden');
+    });
+  });
+
+  // --- ANALYSIS LOGIC ---
+  const setup = (id, type) => {
+    const fileInput = document.getElementById(`file-${id}`);
+    const preview = document.getElementById(`preview-${id}`);
+    const canvas = document.getElementById(`canvas-${id}`);
+    const btn = document.getElementById(`run-${id}`);
+    const result = document.getElementById(`result-${id}`);
+    const placeholder = document.getElementById(`placeholder-${id}`);
+    const classDiv = document.getElementById(`class-${id}`);
+    const loaderDiv = document.getElementById(`loader-${id}`);
+
+    fileInput.addEventListener('change', e => {
+      const f = e.target.files[0];
+      if (!f) return;
+      preview.src = URL.createObjectURL(f);
+      preview.onload = () => {
+        canvas.width = preview.clientWidth;
+        canvas.height = preview.clientHeight;
+      };
+      result.classList.remove('hidden');
+      placeholder.classList.add('hidden');
+      if(classDiv) classDiv.classList.add('hidden');
+    });
+
+    btn.addEventListener('click', async () => {
+      if (!fileInput.files[0]) return alert('Please upload an image first.');
+      
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
+      loaderDiv.classList.add('active');
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      formData.append('type', type);
+
+      try {
+        // Call Flask Backend
+        const response = await fetch('/analyze', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await response.json();
+
+        if (data.error) throw new Error(data.error);
+
+        // Update UI with Backend Results
+        preview.src = data.overlayed_image;
+        
+        if (data.classification && classDiv) {
+          classDiv.innerHTML = `<strong>Classification:</strong> ${data.classification}`;
+          classDiv.classList.remove('hidden');
+        }
+
+      } catch (error) {
+        alert('Analysis failed: ' + error.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Analyze';
+        loaderDiv.classList.remove('active');
+      }
+    });
+  };
+
+  // Initialize for each tab
+  setup('breast', 'breast');
+  setup('brain', 'brain');
+  setup('spine', 'spine');
+});
+</script>
+</body>
+</html>
