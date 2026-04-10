@@ -209,10 +209,15 @@ def analyze():
             
             # Overlay (Red color)
             overlayed = overlay_mask_on_image(image, seg_mask, alpha=0.45)
-            
+            def get_class(num):
+               if num == 0:
+                  return 'Benign'
+               elif num == 1:
+                  return 'Malignant'
+               return 'Normal'
             response_data = {
                 'overlayed_image': image_to_base64(overlayed),
-                'classification': f"{'Benign' if pred_class == 0 else 'Malignant'} ({confidence*100:.1f}%)"
+                'classification': f"{get_class(pred_class)} ({confidence*100:.1f}%)"
             }
 
         # --- BRAIN ANALYSIS (Segmentation Only) ---
